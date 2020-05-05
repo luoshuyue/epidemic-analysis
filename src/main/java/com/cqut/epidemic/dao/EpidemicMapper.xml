@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cqut.epidemic.dao.EpidemicMapper">
+    <!--获取全国疫情确诊、治愈等病例数-->
+    <select id="getDomesticEpidemic"  resultType="com.cqut.epidemic.dto.DomesticEpidemicDTO">
+        SELECT
+            confirmed_number as confirmedNumber,
+            suspected_number as suspectedNumber,
+            severe_number as severeNumber,
+            cure_number as cureNumber,
+            death_number as deathNumber,
+            overseas_import_number as overseasImport
+        FROM
+            domestic_epidemic_situation
+        WHERE
+            DATE( record_time ) = CURDATE( );
+    </select>
+
+    <!--获取各省市疫情确诊、治愈等病例数-->
+    <select id="getProvincesEpidemic" resultType="com.cqut.epidemic.dto.ProvincesEpidemicDTO">
+        select
+            province_name as provinceName,
+            area_name as areaName,
+            confirmed_number as confirmedNumber,
+            suspected_number as suspectedNumber,
+            severe_number as severeNumber,
+            cure_number as cureNumber,
+            death_number as deathNumber,
+            overseas_import_number as overseasImportNumber
+        from
+            epidemic_provinces_situation
+        WHERE
+          DATE( record_time ) = CURDATE( );
+    </select>
+
+    <!--获取疫情动态增长数据-->
+    <select id="getDynamicGrowth" resultType="com.cqut.epidemic.dto.NewDomesticEpidemicDTO">
+        SELECT
+            new_death_number AS newDeathNumber,
+            new_confirmed_number AS newConfirmedNumber,
+            new_cure_number AS newCureNumber,
+            new_overseas_import_number AS newOverseasImportNumber
+        FROM
+            domestic_epidemic_situation
+        WHERE
+            DATE( record_time ) = CURDATE( );
+    </select>
+
+    <!--获取疫情分布情况 针对湖北 / 非湖北-->
+    <select id="getEpidemicDistribution" resultType="com.cqut.epidemic.dto.EpidemicDistributionDTO">
+        SELECT
+            hubei_death_number,
+            not_hubei_death_number,
+            hubei_cure_number,
+            not_hubei_cure_number,
+            hubei_confirmed_number,
+            not_hubei_confirmed_number
+        FROM
+            epidemic_distribution
+        WHERE
+            DATE( record_time ) = CURDATE( );
+    </select>
+
+    <!--获取疫情速增地区-->
+    <select id="getEpidemicGrowthArea" resultType="com.cqut.epidemic.dto.EpidemicGrowthAreaDTO">
+        SELECT
+            province_name as provinceName,
+            sum( new_confirmed_number + new_overseas_import_number) AS total
+        FROM
+            ( SELECT * FROM epidemic_provinces_situation WHERE DATE( record_time ) = CURDATE( ) ) E
+        GROUP BY
+            province_name
+        ORDER BY
+            total DESC
+        LIMIT 10
+    </select>
+
+    <!--获取疫情严重地区 前十-->
+    <select id="getEpidemicArea" resultType="com.cqut.epidemic.dto.EpidemicAreaDTO">
+        SELECT
+            area_name,
+            ( confirmed_number + overseas_import_number ) AS total
+        FROM
+            epidemic_provinces_situation
+        WHERE
+            DATE( record_time ) = CURDATE( )
+        ORDER BY
+            total DESC
+        LIMIT 10
+    </select>
+
+
+
+</mapper>

@@ -1,0 +1,10 @@
+spring:
+  application:
+    name: epidemic
+
+  #数据库配置
+  datasource:
+    url: jdbc:mysql://${MYSQL_URL:localhost:3306/${MYSQL_DATABASE:epidemic}}?characterEncoding=utf8&useUnicode=true&useJDBCCompliantTimezoneShift=true&useLegacyDatetimeCode=false&serverTimezone=UTC&useSSL=false
+    username: ${MYSQL_USER:root}
+    password: ${MYSQL_PASS:luo123579}
+    type: com.alibaba.druid.pool.DruidDataSource
