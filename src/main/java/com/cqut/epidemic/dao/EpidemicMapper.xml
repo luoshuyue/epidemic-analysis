@@ -3,36 +3,37 @@
         PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.cqut.epidemic.dao.EpidemicMapper">
-    <!--获取全国疫情确诊、治愈等病例数-->
+    <!--获取最近10天全国疫情确诊、治愈等病例数-->
     <select id="getDomesticEpidemic"  resultType="com.cqut.epidemic.dto.DomesticEpidemicDTO">
         SELECT
-            confirmed_number as confirmedNumber,
-            suspected_number as suspectedNumber,
-            severe_number as severeNumber,
-            cure_number as cureNumber,
-            death_number as deathNumber,
-            overseas_import_number as overseasImport
+            confirmed_number AS confirmedNumber,
+            suspected_number AS suspectedNumber,
+            severe_number AS severeNumber,
+            cure_number AS cureNumber,
+            death_number AS deathNumber,
+            overseas_import_number AS overseasImport
         FROM
             domestic_epidemic_situation
         WHERE
-            DATE( record_time ) = CURDATE( );
+            record_time >= DATE_SUB( DATE_FORMAT( NOW( ), '%Y-%m-%d' ), INTERVAL 10 DAY )
     </select>
 
     <!--获取各省市疫情确诊、治愈等病例数-->
     <select id="getProvincesEpidemic" resultType="com.cqut.epidemic.dto.ProvincesEpidemicDTO">
-        select
-            province_name as provinceName,
-            area_name as areaName,
-            confirmed_number as confirmedNumber,
-            suspected_number as suspectedNumber,
-            severe_number as severeNumber,
-            cure_number as cureNumber,
-            death_number as deathNumber,
-            overseas_import_number as overseasImportNumber
-        from
+        SELECT
+            province_name AS provinceName,
+            sum( confirmed_number ) AS confirmedNumber,
+            sum( suspected_number ) AS suspectedNumber,
+            sum( severe_number ) AS severeNumber,
+            sum( cure_number ) AS cureNumber,
+            sum( death_number ) AS deathNumber,
+            sum( overseas_import_number ) AS overseasImportNumber
+        FROM
             epidemic_provinces_situation
         WHERE
-          DATE( record_time ) = CURDATE( );
+            DATE( record_time ) = CURDATE( )
+        GROUP BY
+            province_name
     </select>
 
     <!--获取疫情动态增长数据-->
