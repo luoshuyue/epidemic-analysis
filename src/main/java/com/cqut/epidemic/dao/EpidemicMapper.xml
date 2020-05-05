@@ -11,7 +11,8 @@
             severe_number AS severeNumber,
             cure_number AS cureNumber,
             death_number AS deathNumber,
-            overseas_import_number AS overseasImport
+            overseas_import_number AS overseasImport,
+            record_time AS recordTime
         FROM
             domestic_epidemic_situation
         WHERE
